@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <img src = "{{user.profile_url}}" alt = "profile pic" width="150" height="200">
+    <h1>
+        {{user.first_name}} {{user.last_name}}
+</h1>
+    <form action = "/users/{{user.id}}/edit" >
+        <button>Edit</button>
+        <button type = "submit" formaction="/users/{{user.id}}/delete" method = "POST">Delete</button>
+    </form><br><br>
+    
+</body>
+</html>

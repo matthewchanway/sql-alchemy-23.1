@@ -60,13 +60,32 @@ class UserViewsTestCase(TestCase):
             self.assertIn('Test2',html)
             self.assertIn('User2',html)
 
-    def test_delete_user(self):
+    # def test_delete_user(self):
+    #     with app.test_client() as client:
+    #         resp = client.post("/users/2/delete", follow_redirects=True)
+    #         html = resp.get_data(as_text=True)
+
+    #         self.assertEqual(resp.status_code,200)
+    #         self.assertNotIn('ID: 2',html)
+           
+    def test_create_post(self):
         with app.test_client() as client:
-            resp = client.post("/users/2/delete", follow_redirects=True)
+            d = {"title":"Matttest", "content":"well done"}
+            resp = client.post("/users/2/posts/new", data=d,follow_redirects=True)
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code,200)
-            self.assertNotIn('ID: 2',html)
+            self.assertIn('Matttest',html)
+            
+
+    def test_edit_post(self):
+        with app.test_client() as client:
+            d = {"title":"editpost", "content":"edited"}
+            resp = client.post("/posts/1/edit", data=d,follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code,200)
+            self.assertIn('editpost',html)
            
 
 

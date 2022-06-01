@@ -1,8 +1,9 @@
 """Blogly application."""
 
-from flask import Flask, request, redirect, render_template
-from models import db, connect_db, User
+from flask import Flask, request, redirect, render_template, url_for
+from models import db, connect_db, User, Post
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly'
@@ -61,3 +62,53 @@ def delete_user(userid):
     User.query.filter(User.id == userid).delete()
     db.session.commit()
     return redirect("/users")
+
+# Part Two Routes
+
+@app.route("/users/<int:userid>/posts/new")
+def show_new_post_form(userid):
+    user = User.query.get(userid)
+    return render_template("add-post-form.html",user=user)
+
+@app.route("/users/<int:userid>/posts/new", methods = ["POST"])
+def add_new_post(userid):
+    now = datetime.now()
+    title = request.form["title"]
+    content = request.form["content"]
+    new_post = Post(title = title, content=content, created_at=now, user_id = userid )
+    db.session.add(new_post)
+    db.session.commit()
+
+    return redirect(url_for('show_user_info',userid=userid))
+
+@app.route("/posts/<int:postid>")
+def view_post(postid):
+    post = Post.query.get(postid)
+    
+    return render_template("view-post.html",post=post)
+
+@app.route("/posts/<int:postid>/edit")
+def show_edit_post_form(postid):
+    post = Post.query.get(postid)
+    return render_template("edit-post.html",post=post)
+
+@app.route("/posts/<int:postid>/edit", methods = ["POST"])
+def handle_edit_post_from(postid):
+    post = Post.query.get(postid)
+    title = request.form["title"]
+    content = request.form["content"]
+    post.title = title
+    post.content = content
+    db.session.add(post)
+    db.session.commit()
+    return redirect(url_for('view_post',postid=postid))
+
+@app.route("/posts/<int:postid>/delete", methods = ["POST","GET"])
+def handle_delete(postid):
+    post = Post.query.get(postid)
+    userid = post.user_id
+    Post.query.filter_by(id=postid).delete()
+    db.session.commit()
+
+    return redirect(url_for('show_user_info',userid=userid))
+    
